@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>八卦钟</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        .title {
+            color: #ffd700;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .bagua-clock {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #2a2a4a 0%, #1a1a2e 100%);
+            box-shadow:
+                0 0 30px rgba(255, 215, 0, 0.3),
+                inset 0 0 50px rgba(0, 0, 0, 0.5);
+            border: 3px solid #ffd700;
+        }
+
+        .outer-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            animation: rotate 60s linear infinite;
+        }
+
+        .trigram {
+            position: absolute;
+            width: 60px;
+            text-align: center;
+            transform-origin: center;
+        }
+
+        .trigram-name {
+            color: #ffd700;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .trigram-symbol {
+            font-size: 2rem;
+            line-height: 0.6;
+        }
+
+        .yin-line {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 3px 0;
+        }
+
+        .yin-line span {
+            width: 20px;
+            height: 6px;
+            background: #ffd700;
+            border-radius: 2px;
+        }
+
+        .yang-line {
+            width: 48px;
+            height: 6px;
+            background: #ffd700;
+            margin: 3px auto;
+            border-radius: 2px;
+        }
+
+        .center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #3a3a5a 0%, #2a2a4a 100%);
+            border: 2px solid #ffd700;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .taiji {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(90deg, #1a1a2e 50%, #ffd700 50%);
+            position: relative;
+            animation: rotate-taiji 10s linear infinite;
+        }
+
+        .taiji::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ffd700;
+        }
+
+        .taiji::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #1a1a2e;
+        }
+
+        .taiji-dot-yin {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #1a1a2e;
+            z-index: 1;
+        }
+
+        .taiji-dot-yang {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ffd700;
+            z-index: 1;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes rotate-taiji {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: #1a1a2e;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .speed-control {
+            margin-top: 15px;
+            color: #ffd700;
+        }
+
+        .speed-control input {
+            width: 200px;
+            margin-left: 10px;
+        }
+
+        .paused .outer-ring,
+        .paused .taiji {
+            animation-play-state: paused;
+        }
+
+        .time-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ffd700;
+            font-size: 0.9rem;
+            z-index: 10;
+            margin-top: 70px;
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">☯ 八卦钟 ☯</h1>
+        <div class="bagua-clock" id="clock">
+            <div class="outer-ring" id="outerRing">
+                <!-- 八卦将由 JavaScript 生成 -->
+            </div>
+            <div class="center">
+                <div class="taiji">
+                    <div class="taiji-dot-yin"></div>
+                    <div class="taiji-dot-yang"></div>
+                </div>
+            </div>
+            <div class="time-display" id="timeDisplay"></div>
+        </div>
+        <div class="controls">
+            <button id="toggleBtn" onclick="toggleRotation()">暂停</button>
+            <button onclick="reverseRotation()">反转</button>
+            <button onclick="resetRotation()">重置</button>
+        </div>
+        <div class="speed-control">
+            <label>旋转速度:</label>
+            <input type="range" id="speedSlider" min="5" max="120" value="60" onchange="changeSpeed(this.value)">
+            <span id="speedValue">60秒/圈</span>
+        </div>
+    </div>
+
+    <script>
+        // 八卦数据：名称、符号、角度位置（后天八卦方位）
+        const trigrams = [
+            { name: '离', symbol: '☲', lines: ['yang', 'yin', 'yang'], angle: 0, element: '火' },      // 南
+            { name: '坤', symbol: '☷', lines: ['yin', 'yin', 'yin'], angle: 45, element: '地' },      // 西南
+            { name: '兑', symbol: '☱', lines: ['yin', 'yin', 'yang'], angle: 90, element: '泽' },     // 西
+            { name: '乾', symbol: '☰', lines: ['yang', 'yang', 'yang'], angle: 135, element: '天' },  // 西北
+            { name: '坎', symbol: '☵', lines: ['yin', 'yang', 'yin'], angle: 180, element: '水' },     // 北
+            { name: '艮', symbol: '☶', lines: ['yang', 'yin', 'yin'], angle: 225, element: '山' },    // 东北
+            { name: '震', symbol: '☳', lines: ['yin', 'yin', 'yang'], angle: 270, element: '雷' },    // 东 (修正)
+            { name: '巽', symbol: '☴', lines: ['yang', 'yang', 'yin'], angle: 315, element: '风' }    // 东南
+        ];
+
+        // 生成卦象线条
+        function createLines(lines) {
+            return lines.map(line => {
+                if (line === 'yang') {
+                    return '<div class="yang-line"></div>';
+                } else {
+                    return '<div class="yin-line"><span></span><span></span></div>';
+                }
+            }).join('');
+        }
+
+        // 初始化八卦位置
+        function initTrigrams() {
+            const outerRing = document.getElementById('outerRing');
+            const radius = 160; // 距离中心的半径
+            const clockSize = 400;
+            const clockCenter = clockSize / 2;
+
+            trigrams.forEach((trigram, index) => {
+                const div = document.createElement('div');
+                div.className = 'trigram';
+                div.innerHTML = `
+                    <div class="trigram-name">${trigram.name}</div>
+                    <div class="trigram-symbol">${createLines(trigram.lines)}</div>
+                `;
+
+                // 计算位置（从顶部开始，顺时针）
+                const angle = (index * 45 - 90) * Math.PI / 180; // -90度使第一个从顶部开始
+                const x = clockCenter + radius * Math.cos(angle) - 30;
+                const y = clockCenter + radius * Math.sin(angle) - 40;
+
+                div.style.left = `${x}px`;
+                div.style.top = `${y}px`;
+
+                outerRing.appendChild(div);
+            });
+        }
+
+        let isRotating = true;
+        let isReversed = false;
+        let currentSpeed = 60;
+
+        function toggleRotation() {
+            const clock = document.getElementById('clock');
+            const btn = document.getElementById('toggleBtn');
+            isRotating = !isRotating;
+
+            if (isRotating) {
+                clock.classList.remove('paused');
+                btn.textContent = '暂停';
+            } else {
+                clock.classList.add('paused');
+                btn.textContent = '继续';
+            }
+        }
+
+        function reverseRotation() {
+            const outerRing = document.getElementById('outerRing');
+            const taiji = document.querySelector('.taiji');
+            isReversed = !isReversed;
+
+            if (isReversed) {
+                outerRing.style.animationDirection = 'reverse';
+                taiji.style.animationDirection = 'reverse';
+            } else {
+                outerRing.style.animationDirection = 'normal';
+                taiji.style.animationDirection = 'normal';
+            }
+        }
+
+        function resetRotation() {
+            const outerRing = document.getElementById('outerRing');
+            const taiji = document.querySelector('.taiji');
+
+            // 重置动画
+            outerRing.style.animation = 'none';
+            taiji.style.animation = 'none';
+            outerRing.offsetHeight; // 触发重排
+            taiji.offsetHeight;
+
+            outerRing.style.animation = `rotate ${currentSpeed}s linear infinite`;
+            taiji.style.animation = `rotate-taiji ${currentSpeed / 6}s linear infinite`;
+
+            if (isReversed) {
+                outerRing.style.animationDirection = 'reverse';
+                taiji.style.animationDirection = 'reverse';
+            }
+
+            if (!isRotating) {
+                document.getElementById('clock').classList.add('paused');
+            }
+        }
+
+        function changeSpeed(value) {
+            currentSpeed = value;
+            document.getElementById('speedValue').textContent = `${value}秒/圈`;
+
+            const outerRing = document.getElementById('outerRing');
+            const taiji = document.querySelector('.taiji');
+
+            outerRing.style.animationDuration = `${value}s`;
+            taiji.style.animationDuration = `${value / 6}s`;
+        }
+
+        // 更新时间显示
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('zh-CN', { hour12: false });
+            document.getElementById('timeDisplay').textContent = timeStr;
+        }
+
+        // 初始化
+        initTrigrams();
+        updateTime();
+        setInterval(updateTime, 1000);
+    </script>
+</body>
+</html>
