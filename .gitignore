@@ -1,0 +1,11 @@
+# 忽略所有文件
+*
+
+# 白名单：放行已追踪的文件和目录
+!.gitignore
+!.mcp.json
+!LICENSE
+!netease_music_scraper.py
+!yituyu_scraper.py
+!claude_code/
+!claude_code/八卦钟.html
