@@ -4,6 +4,7 @@
 # 白名单：放行已追踪的文件和目录
 !.gitignore
 !.mcp.json
+!plugins.json
 !LICENSE
 !netease_music_scraper.py
 !yituyu_scraper.py
